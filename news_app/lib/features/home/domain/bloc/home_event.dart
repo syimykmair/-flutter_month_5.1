@@ -10,3 +10,9 @@ sealed class HomeEvent extends Equatable {
 class GetNewsEvent extends HomeEvent {
   const GetNewsEvent();
 }
+
+class SearchNewsEvent extends HomeEvent {
+  final String query;
+
+  SearchNewsEvent(this.query);
+}
