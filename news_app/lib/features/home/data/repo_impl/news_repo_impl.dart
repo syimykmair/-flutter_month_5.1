@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:news_app/core/util/transformable.dart';
 import 'package:news_app/features/home/data/data_source/abstract/news_data_source.dart';
 import 'package:news_app/features/home/data/model/news_article_model.dart';
 import 'package:news_app/features/home/domain/entities/news_article_entity.dart';
@@ -14,13 +15,14 @@ class NewsRepoImpl extends NewsRepository {
   Future<List<NewsArticleEntity>> getEverythingNews() async {
     final List<NewsArticleModel> data = await newsDataSource
         .getEverythingNews();
-    return data.map((model) => model.convertToEntity()).toList();
+    return data.transform();
+
   }
      @override
   Future<List<NewsArticleEntity>> searchNews(String query) async {
     final List<NewsArticleModel> data =
         await newsDataSource.searchNews(query);
 
-    return data.map((model) => model.convertToEntity()).toList();
+    return data.transform();
   }
 }

@@ -1,16 +1,114 @@
-# news_app
+# News App
 
-A new Flutter project.
+Flutter-приложение для просмотра новостей через [NewsAPI](https://newsapi.org/).
+На главном экране загружаются топ-новости, пользователь может искать статьи по
+ключевому слову и открывать подробную страницу выбранной новости.
 
-## Getting Started
+## Возможности
 
-This project is a starting point for a Flutter application.
+- Загрузка топ-новостей США через endpoint `v2/top-headlines`.
+- Поиск новостей по запросу через endpoint `v2/everything`.
+- Отображение списка новостей в виде сетки карточек.
+- Просмотр деталей новости: изображение, заголовок, автор, дата, описание и
+  содержимое.
+- Обработка состояний загрузки, успешного ответа и ошибки через BLoC.
+- Форматирование даты публикации на русском языке.
+- Логирование HTTP-запросов и ответов через Talker.
 
-A few resources to get you started if this is your first Flutter project:
+## Технологии
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- Flutter / Dart
+- flutter_bloc
+- Dio
+- GetIt
+- Injectable
+- Equatable
+- Intl
+- Talker / Talker Dio Logger
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Архитектура проекта
+
+Проект разделен по feature-first подходу:
+
+```text
+lib/
+  core/
+    di/                 # настройка GetIt и Injectable
+    util/               # общие утилиты и преобразование моделей
+  features/
+    home/
+      data/             # модели, источники данных, реализация репозитория
+      domain/           # сущности, репозиторий, BLoC
+      ui/               # страницы и виджеты интерфейса
+  main.dart             # точка входа приложения
+```
+
+Основной поток данных:
+
+```text
+UI -> HomeBloc -> NewsRepository -> NewsDataSource -> NewsAPI
+```
+
+Модели из слоя `data` преобразуются в domain-сущности через `Transformable`.
+
+## Установка и запуск
+
+1. Установите зависимости:
+
+```bash
+flutter pub get
+```
+
+2. При необходимости пересоберите сгенерированные файлы Injectable:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+3. Запустите приложение:
+
+```bash
+flutter run
+```
+
+## API
+
+Приложение использует базовый URL:
+
+```text
+https://newsapi.org/
+```
+
+API-ключ сейчас указан в `NewsRemoteDataSourceImpl`. Для учебного проекта этого
+достаточно, но для реального приложения лучше вынести ключ из исходного кода в
+переменные окружения, `--dart-define` или отдельную конфигурацию, которая не
+попадает в репозиторий.
+
+## Полезные команды
+
+Проверка кода анализатором:
+
+```bash
+flutter analyze
+```
+
+Запуск тестов:
+
+```bash
+flutter test
+```
+
+Обновление generated-файлов после изменения DI-аннотаций:
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```
+
+## Текущее состояние
+
+- Реализован удаленный источник данных `NewsRemoteDataSourceImpl`.
+- Локальный источник данных `NewsLocalDataSourceImpl` пока является заготовкой.
+- Тексты интерфейса рассчитаны на русский язык, дата также форматируется в
+  русской локали.
+- Приложение поддерживает стандартные Flutter-платформы, созданные шаблоном:
+  Android, iOS, Web, Windows, macOS и Linux.

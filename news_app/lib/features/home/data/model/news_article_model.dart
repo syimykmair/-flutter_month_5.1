@@ -1,6 +1,8 @@
+import 'package:news_app/core/util/transformable.dart';
+import 'package:news_app/core/util/utils.dart';
 import 'package:news_app/features/home/domain/entities/news_article_entity.dart';
 
-class NewsArticleModel {
+class NewsArticleModel with Transformable<NewsArticleEntity> {
   NewsArticleModel({
     this.author,
     this.title,
@@ -37,14 +39,15 @@ class NewsArticleModel {
         .toList();
   }
 
-  NewsArticleEntity convertToEntity() {
+  @override
+  NewsArticleEntity transform() {
     return NewsArticleEntity(
       author: author ?? "",
       title: title ?? "",
       description: description ?? "",
       url: url ?? "",
       urlToImage: urlToImage ?? "",
-      publishedAt: publishedAt ?? "",
+      publishedAt: parseDate(publishedAt),
       content: content ?? "",
     );
   }
