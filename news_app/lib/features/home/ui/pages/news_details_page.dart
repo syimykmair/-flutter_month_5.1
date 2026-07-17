@@ -4,24 +4,17 @@ import 'package:news_app/features/home/domain/entities/news_article_entity.dart'
 class NewsDetailsPage extends StatelessWidget {
   final NewsArticleEntity article;
 
-  const NewsDetailsPage({
-    super.key,
-    required this.article,
-  });
+  const NewsDetailsPage({super.key, required this.article});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Новость"),
-      ),
+      appBar: AppBar(title: const Text("Новость")),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            if (article.urlToImage != null &&
-                article.urlToImage!.isNotEmpty)
+            if (article.urlToImage != null && article.urlToImage!.isNotEmpty)
               Image.network(
                 article.urlToImage!,
                 width: double.infinity,
@@ -34,7 +27,6 @@ class NewsDetailsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   Text(
                     article.title ?? "Без заголовка",
                     style: const TextStyle(
@@ -49,9 +41,7 @@ class NewsDetailsPage extends StatelessWidget {
                     children: [
                       const Icon(Icons.person, size: 18),
                       const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(article.author),
-                      ),
+                      Expanded(child: Text(article.author)),
                     ],
                   ),
 
@@ -80,10 +70,7 @@ class NewsDetailsPage extends StatelessWidget {
 
                   Text(
                     article.content ?? "Полный текст отсутствует",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.6,
-                    ),
+                    style: const TextStyle(fontSize: 16, height: 1.6),
                   ),
                 ],
               ),

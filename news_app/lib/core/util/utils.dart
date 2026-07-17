@@ -1,7 +1,6 @@
-
 import 'package:intl/intl.dart';
 
-String parseDate (String? date) {
+String parseDate(String? date) {
   if (date == null) return 'Нет даты';
   final DateTime dateTime = DateTime.parse(date).toLocal();
 

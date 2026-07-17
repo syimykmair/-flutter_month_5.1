@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/core/di/service_locator.dart';
@@ -6,8 +7,11 @@ import 'package:news_app/features/home/domain/bloc/home_event.dart';
 import 'package:news_app/features/home/domain/bloc/home_state.dart';
 import 'package:news_app/features/home/ui/pages/news_details_page.dart';
 import 'package:news_app/features/home/ui/widgets/news_search_bar.dart';
-
+import '../../../auth/domain/cubit/auth_cubit.dart';
+import '../../../auth/domain/cubit/auth_state.dart';
 import '../widgets/news_article_list.dart';
+import 'package:news_app/features/home/ui/pages/menu_page.dart';
+import 'package:news_app/features/home/ui/pages/favourite_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,26 +26,38 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<HomeBloc>()..add(GetNewsEvent()),
-      child: Scaffold(
-        body: SafeArea(
-          child: IndexedStack(
-            index: _selectedIndex,
-            children: [
-              _ExplorePage(controller: _controller),
-              const SizedBox.shrink(),
-              const SizedBox.shrink(),
-            ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => getIt<HomeBloc>()..add(GetNewsEvent())),
+
+        BlocProvider(create: (_) => getIt<AuthCubit>()),
+      ],
+
+      child: BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (state is AuthUnauthenticated) {
+            context.router.replacePath('/auth');
+          }
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: IndexedStack(
+              index: _selectedIndex,
+              children: [
+                _ExplorePage(controller: _controller),
+                const FavouritePage(),
+                const MenuPage(),
+              ],
+            ),
           ),
-        ),
-        bottomNavigationBar: _NewsBottomNavigation(
-          currentIndex: _selectedIndex,
-          onChanged: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
+          bottomNavigationBar: _NewsBottomNavigation(
+            currentIndex: _selectedIndex,
+            onChanged: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+          ),
         ),
       ),
     );
@@ -55,9 +71,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _ExplorePage extends StatelessWidget {
-  const _ExplorePage({
-    required this.controller,
-  });
+  const _ExplorePage({required this.controller});
 
   final TextEditingController controller;
 
@@ -206,11 +220,7 @@ class _NavigationItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                icon,
-                width: 34,
-                height: 34,
-              ),
+              Image.asset(icon, width: 34, height: 34),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 160),
                 child: isSelected
