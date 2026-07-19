@@ -28,37 +28,46 @@ void setupServiceLocator() {
       () => AuthCubit(authRepository: getIt(), secureStorageService: getIt()),
     );
 }
-
 @module
 abstract class AppModule {
+
   @lazySingleton
   Future<SharedPreferences> get sharedPreferences async =>
       await SharedPreferences.getInstance();
 
   @lazySingleton
-  FlutterSecureStorage get flutterSecureStorage => FlutterSecureStorage();
+  FlutterSecureStorage get flutterSecureStorage =>
+      const FlutterSecureStorage();
 
   @lazySingleton
   Talker get talker => TalkerFlutter.init();
 
   @lazySingleton
-  TalkerDioLogger get talkerDioLogger => TalkerDioLogger(
-    talker: talker,
-    settings: const TalkerDioLoggerSettings(
-      printRequestData: true,
-      printRequestHeaders: false,
-      printResponseData: true,
-      printResponseMessage: true,
-      printResponseHeaders: true,
-      printResponseTime: true,
-      hiddenHeaders: {'X-Api-Key'},
-    ),
-  );
+  TalkerDioLogger talkerDioLogger(Talker talker) {
+    return TalkerDioLogger(
+      talker: talker,
+      settings: const TalkerDioLoggerSettings(
+        printRequestData: true,
+        printRequestHeaders: false,
+        printResponseData: true,
+        printResponseMessage: true,
+        printResponseHeaders: true,
+        printResponseTime: true,
+        hiddenHeaders: {'X-Api-Key'},
+      ),
+    );
+  }
 
   @lazySingleton
-  Dio dio() {
-    final Dio dio = Dio(BaseOptions(baseUrl: "https://newsapi.org/"));
-    dio.interceptors.add(talkerDioLogger);
+  Dio dio(TalkerDioLogger logger) {
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: "https://newsapi.org/",
+      ),
+    );
+
+    dio.interceptors.add(logger);
+
     return dio;
   }
 }

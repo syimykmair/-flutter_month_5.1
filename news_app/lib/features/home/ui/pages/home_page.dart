@@ -2,14 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/core/di/service_locator.dart';
-import 'package:news_app/features/home/domain/bloc/home_bloc.dart';
-import 'package:news_app/features/home/domain/bloc/home_event.dart';
-import 'package:news_app/features/home/domain/bloc/home_state.dart';
-import 'package:news_app/features/home/ui/pages/news_details_page.dart';
-import 'package:news_app/features/home/ui/widgets/news_search_bar.dart';
+import 'package:news_app/features/everything/ui/everything_page.dart';
 import '../../../auth/domain/cubit/auth_cubit.dart';
 import '../../../auth/domain/cubit/auth_state.dart';
-import '../widgets/news_article_list.dart';
 import 'package:news_app/features/home/ui/pages/menu_page.dart';
 import 'package:news_app/features/home/ui/pages/favourite_page.dart';
 
@@ -21,14 +16,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final TextEditingController _controller = TextEditingController();
   int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => getIt<HomeBloc>()..add(GetNewsEvent())),
 
         BlocProvider(create: (_) => getIt<AuthCubit>()),
       ],
@@ -44,7 +37,7 @@ class _HomePageState extends State<HomePage> {
             child: IndexedStack(
               index: _selectedIndex,
               children: [
-                _ExplorePage(controller: _controller),
+                EverythingPage(),
                 const FavouritePage(),
                 const MenuPage(),
               ],
@@ -63,74 +56,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+
 }
 
-class _ExplorePage extends StatelessWidget {
-  const _ExplorePage({required this.controller});
 
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<HomeBloc, HomeState>(
-      builder: (context, state) {
-        if (state is HomeLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is HomeFailure) {
-          return Center(
-            child: Text(
-              'Request error: ${state.message}',
-              style: const TextStyle(fontSize: 22, color: Colors.red),
-            ),
-          );
-        }
-
-        if (state is HomeSuccess) {
-          return Column(
-            children: [
-              NewsSearchBar(
-                controller: controller,
-                onSearch: () {
-                  final text = controller.text.trim();
-
-                  if (text.isNotEmpty) {
-                    context.read<HomeBloc>().add(SearchNewsEvent(text));
-                  }
-                },
-                onClear: () {
-                  controller.clear();
-                  context.read<HomeBloc>().add(GetNewsEvent());
-                },
-              ),
-              Expanded(
-                child: NewsArticlesList(
-                  articles: state.news,
-                  onTap: (article) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => NewsDetailsPage(article: article),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        }
-
-        return const SizedBox.shrink();
-      },
-    );
-  }
-}
 
 class _NewsBottomNavigation extends StatelessWidget {
   const _NewsBottomNavigation({
